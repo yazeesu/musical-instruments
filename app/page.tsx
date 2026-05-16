@@ -1,18 +1,19 @@
 "use client";
 
 import { InstrumentAudioEngine } from "@/src/audio/core";
-import { SimplePianoInstrument } from "@/src/audio/instruments/simple-piano";
+import { SynthBassInstrument } from "@/src/audio/instruments/synth-bass-guitar";
 import SimplePiano from "@/src/instruments/simple-piano/simple-piano";
 import { createPianoLayout } from "@/src/piano/layout";
 import { useEffect, useRef } from "react";
 
-const PIANO_LAYOUT = createPianoLayout(3, 4);
+const PIANO_LAYOUT = createPianoLayout(1, 3);
 
 export default function Home() {
   const instrumentAudioEngineRef = useRef<InstrumentAudioEngine | null>(null);
+
   useEffect(() => {
-    instrumentAudioEngineRef.current = new SimplePianoInstrument();
-    console.log("Done : ", instrumentAudioEngineRef.current);
+    instrumentAudioEngineRef.current = new SynthBassInstrument();
+
     return () => {
       instrumentAudioEngineRef.current?.dispose();
     };
