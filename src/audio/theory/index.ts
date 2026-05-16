@@ -63,6 +63,7 @@ const BASE_A_FREQUENCY = 440;
  * convertNoteToMIDI("D#4") // 63 -> MIDI number
  * @param note - Note name to convert to MIDI number.
  * @returns
+ * @deprecated - ToneJS provides this function out of the box.
  */
 export const convertNoteToMIDI = (note: string): number => {
   const match = note.match(/^([A-G]#?)(\d)$/);
@@ -84,6 +85,7 @@ export const convertNoteToMIDI = (note: string): number => {
  * console.log(frequency, "Hz"); // 440 Hz
  * @param midi - MIDI note number to convert to frequency.
  * @returns
+ * @deprecated - ToneJS provides this function out of the box.
  */
 export const convertMIDIToFrequency = (midi: number): number =>
   BASE_A_FREQUENCY * Math.pow(2, (midi - 69) / 12);
@@ -92,6 +94,7 @@ export const convertMIDIToFrequency = (midi: number): number =>
  * Abstracts the conversion of a note to a frequency.
  * @param note - Note name to convert to frequency.
  * @returns
+ * @deprecated - ToneJS provides this function out of the box.
  */
 export const convertNoteToFrequency = (note: string): number =>
   convertMIDIToFrequency(convertNoteToMIDI(note));
