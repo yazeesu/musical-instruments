@@ -42,16 +42,17 @@ export class SynthRetroPianoInstrument implements InstrumentAudioEngine {
     });
 
     this.synth.chain(this.highpass, this.lowpass, this.reverb);
-    // this.synth.connect(this.reverb);
   }
 
-  async playNote(options: { note: string; velocity?: number }): Promise<void> {
-    const { note, velocity = 0.8 } = options;
+  async playNote(options: {
+    note: string;
+    velocity?: number;
+    duration?: number;
+    time?: number;
+  }): Promise<void> {
+    const { note, velocity = 0.8, duration = 0.1, time = Tone.now() } = options;
     const frequency = convertNoteToFrequency(note);
-
-    console.log("Playing note: ", note, " | ", frequency, "Hz");
-
-    this.synth.triggerAttack(note, 0.1, velocity);
+    this.synth.triggerAttack(note, duration, velocity);
   }
 
   async muteNote(options: { note: string }): Promise<void> {

@@ -114,17 +114,27 @@ export class SynthBassInstrument implements InstrumentAudioEngine {
     this.compressor.chain(this.finalCabinetFilter, this.reverb);
   }
 
-  async playNote(options: { note: string; velocity?: number }): Promise<void> {
-    const { note, velocity = 0.85 } = options;
+  async playNote(options: {
+    note: string;
+    velocity?: number;
+    duration?: number;
+    time?: number;
+  }): Promise<void> {
+    const {
+      note,
+      velocity = 0.85,
+      duration = undefined,
+      time = Tone.now(),
+    } = options;
 
     const randomDetune = (Math.random() - 0.5) * 15;
     this.synth.set({ detune: randomDetune });
 
     const randomFretResonance = 700 + Math.random() * 500;
-    this.noiseFilter.frequency.setValueAtTime(randomFretResonance, Tone.now());
+    this.noiseFilter.frequency.setValueAtTime(randomFretResonance, time);
 
-    this.noiseEnvelope.triggerAttackRelease("8n", Tone.now(), velocity);
-    this.synth.triggerAttack(note, undefined, velocity);
+    this.noiseEnvelope.triggerAttackRelease("8n", time, velocity);
+    this.synth.triggerAttack(note, duration, velocity);
   }
 
   async muteNote(options: { note: string }): Promise<void> {
