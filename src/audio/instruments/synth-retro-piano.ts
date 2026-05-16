@@ -1,6 +1,5 @@
 import * as Tone from "tone";
 import { InstrumentAudioEngine } from "../core";
-import { convertNoteToFrequency } from "../theory";
 
 export class SynthRetroPianoInstrument implements InstrumentAudioEngine {
   private synth: Tone.PolySynth;
@@ -51,21 +50,16 @@ export class SynthRetroPianoInstrument implements InstrumentAudioEngine {
     time?: number;
   }): Promise<void> {
     const { note, velocity = 0.8, duration = 0.1, time = Tone.now() } = options;
-    const frequency = convertNoteToFrequency(note);
     this.synth.triggerAttack(note, duration, velocity);
   }
 
   async muteNote(options: { note: string }): Promise<void> {
     const { note } = options;
-    const frequency = convertNoteToFrequency(note);
-
-    console.log("Muting note: ", note, " | ", frequency, "Hz");
 
     this.synth.triggerRelease(note);
   }
 
   dispose(): void {
-    console.log("Disposing simple piano instrument...");
     this.synth.dispose();
     this.highpass.dispose();
     this.lowpass.dispose();
