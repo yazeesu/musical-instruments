@@ -2,7 +2,7 @@ import * as Tone from "tone";
 import { InstrumentAudioEngine } from "../core";
 import { convertNoteToFrequency } from "../theory";
 
-export class SimplePianoInstrument implements InstrumentAudioEngine {
+export class SynthRetroPianoInstrument implements InstrumentAudioEngine {
   private synth: Tone.PolySynth;
   private reverb: Tone.Reverb;
   private lowpass: Tone.Filter;
