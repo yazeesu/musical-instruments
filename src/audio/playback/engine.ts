@@ -4,19 +4,59 @@ import { InstrumentAudioEngine } from "../core";
 import { MIDIPlaybackError, MIDISourceError } from "./errors";
 import { AudioPlayerEngine, AudioPlayerSourceLoadResult } from "./core";
 
+/**
+ * Imports `.mid` files and plays them using the ToneJS library.
+ * @implements {AudioPlayerEngine<Midi>}
+ * @see {@link AudioPlayerEngine} for the interface implementation.
+ */
 export class MIDIPlaybackEngine implements AudioPlayerEngine<Midi> {
+  /**
+   * A map of instrument keys to instrument audio engines.
+   * @see {@link InstrumentAudioEngine} for the interface implementation.
+   */
   private _instrumentMap: Map<string, InstrumentAudioEngine> = new Map();
 
+  /**
+   * The loaded MIDI file source.
+   */
   private _midiFile: Midi | null = null;
+
+  /**
+   * The ToneJS transport instance.
+   */
   private _transport = Tone.getTransport();
 
+  /**
+   * The default BPM. If the MIDI file does not specify any BPM, it will be playing at 120 BPM.
+   */
   private _defaultBpm = 120;
+
+  /**
+   * Multiplier for the BPM.
+   * 1 means the BPM will be the same as the MIDI file.
+   * Higher values will make the playback faster.
+   * Lower values will make the playback slower.
+   */
   private _bpmScale = 1;
 
+  /**
+   * Generates a key for the instrument.
+   * @param family - The family of the instrument.
+   * @param name - The name of the instrument.
+   * @returns The key for the instrument in string type.
+   */
   private generateInstrumentKey(family: string, name: string) {
     return `${family}__${name}`;
   }
 
+  /**
+   * Registers an instrument into the audio player engine.
+   *
+   * @param family - The family of the instrument.
+   * @param name - The name of the instrument.
+   * @param instrument - The instrument audio engine to use for the instrument.
+   * @returns The audio player engine itself.
+   */
   withInstrument(
     family: string,
     name: string,
@@ -29,11 +69,22 @@ export class MIDIPlaybackEngine implements AudioPlayerEngine<Midi> {
     return this;
   }
 
+  /**
+   * Registers a BPM scale into the audio player engine.
+   *
+   * @param scale - The target BPM scale. ( min: 0.1, default: 1 )
+   * @returns The audio player engine itself.
+   */
   withBpmScale(scale: number) {
     this._bpmScale = Math.max(0.1, scale);
     return this;
   }
 
+  /**
+   * Extracts the instrument instance from the registered instrument map.
+   * @param track - The track to extract the instrument from.
+   * @returns The instrument audio engine instance. Returns `null` if the instrument is not registered.
+   */
   private resolveInstrument(track: Track): InstrumentAudioEngine | null {
     const family = track.instrument.family;
     const name = track.instrument.name;
@@ -41,6 +92,10 @@ export class MIDIPlaybackEngine implements AudioPlayerEngine<Midi> {
     return this._instrumentMap.get(instrumentKey) ?? null;
   }
 
+  /**
+   * Loads the MIDI file into the audio player engine.
+   * @see {@link AudioPlayerEngine.load()} for the interface implementation.
+   */
   async load(source: string): Promise<AudioPlayerSourceLoadResult<Midi>> {
     try {
       const response = await fetch(source);
@@ -84,6 +139,10 @@ export class MIDIPlaybackEngine implements AudioPlayerEngine<Midi> {
     }
   }
 
+  /**
+   * Plays the source.
+   * @see {@link AudioPlayerEngine.play()} for the interface implementation.
+   */
   async play() {
     if (this._midiFile === null) {
       throw new MIDIPlaybackError(
@@ -118,11 +177,11 @@ export class MIDIPlaybackEngine implements AudioPlayerEngine<Midi> {
         const start = note.time;
         const end = start + note.duration;
 
-        Tone.Transport.schedule(() => {
+        this._transport.schedule(() => {
           void instrument.playNote({ note: n, velocity: vel });
         }, start);
 
-        Tone.Transport.schedule(() => {
+        this._transport.schedule(() => {
           void instrument.muteNote({ note: n });
         }, end);
       });
@@ -131,12 +190,28 @@ export class MIDIPlaybackEngine implements AudioPlayerEngine<Midi> {
     this._transport.start();
   }
 
+  /**
+   * TODO: Implement `pause()` method.
+   * @see {@link AudioPlayerEngine.pause()} for the interface implementation.
+   */
   async pause() {}
 
+  /**
+   * TODO: Implement `stop()` method.
+   * @see {@link AudioPlayerEngine.stop()} for the interface implementation.
+   */
   async stop() {}
 
+  /**
+   * TODO: Implement `restart()` method.
+   * @see {@link AudioPlayerEngine.restart()} for the interface implementation.
+   */
   async restart() {}
 
+  /**
+   * Disposes the audio player engine.
+   * @see {@link AudioPlayerEngine.dispose()} for the interface implementation.
+   */
   async dispose() {
     this._transport.stop();
     this._transport.cancel();

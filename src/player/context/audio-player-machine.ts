@@ -2,22 +2,41 @@ import { AudioPlayerEngine } from "@/src/audio/playback/core";
 import { Midi } from "@tonejs/midi";
 import { fromPromise, setup } from "xstate";
 
+/**
+ * The events that can be sent to the audio player state machine.
+ */
 export type AudioPlayerMachineEvent =
   | { type: "LOAD" }
   | { type: "PLAY" }
   | { type: "PAUSE" }
   | { type: "STOP" };
 
+/**
+ * The context of the audio player state machine.
+ */
 export type AudioPlayerMachineContext<TSource = unknown> = {
   engineRef: React.RefObject<AudioPlayerEngine<TSource> | null>;
   source: string;
 };
 
+/**
+ * The input type of the audio player state machine.
+ */
 export type AudioPlayerMachineInput<TSource = unknown> = {
   engineRef: React.RefObject<AudioPlayerEngine<TSource> | null>;
   source: string;
 };
 
+/**
+ * The state machine for the audio player in order to manage the state of the audio player.
+ * Valid states are:
+ * - `idle` - The initial state. This is the state when the source is not loaded yet.
+ * - `loading` - The state when the source is loading.
+ * - `ready` - The state when the source is loaded and ready to play.
+ * - `playing` - The state when the source is playing.
+ * - `paused` - The state when the source is paused.
+ * - `error` - The state when an error occurs.
+ */
 export const audioPlayerMachine = setup({
   types: {
     context: {} as AudioPlayerMachineContext<Midi>,
